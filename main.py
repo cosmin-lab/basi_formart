@@ -16,4 +16,5 @@ def disegna_P():
     for riga in matrice_P:
         print(''.join(riga))
 disegna_P()
+ 
 
