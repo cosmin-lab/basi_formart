@@ -1,0 +1,275 @@
+stanze_disponibili = {     # Prima definisco due dizionari, dato che voglio che voglio che il programma tenga traccia delle risorse disponibili.
+    "camera singola": 5,
+    "camera doppia": 8,
+    "camera tripla": 3,
+    "camera multipla": 2,
+    "camera deluxe": 4,
+    "camera luna di miele": 2,
+    "suite": 3,
+    "calla suite": 1,
+    "suite presidenziale": 1,
+    "sgabuzzino": 10,
+}
+
+prenotazioni = {        # Dato che vorrei che il programma tenesse conto anche delle prenotazioni inserisco un altro dizionario, con numero camere prenotate 0, ipotizzando che non ci siano prenotazioni.
+                        #Inserendo altri valori non cambiarebbe niente se non il fatto che alcune stanze risulterebbero gia prenotate.
+    "camera singola": 0,
+    "camera doppia": 0,
+    "camera tripla": 0,
+    "camera multipla": 0,
+    "camera deluxe": 0,
+    "camera luna di miele": 0,
+    "suite": 0,
+    "calla suite": 0,
+    "suite presidenziale": 0,
+    "sgabuzzino": 0,
+}
+
+prenotazioni_salvate = [] #Questa lista funge da struttura dati per archiviare informazioni. Mantiene un elenco anche dopo la chiusura del programma e permette di rintracciare i dati. Infatti ho pensato di inserirlo prima di tutto il resto del codice cosi da potersi riferire a tutto il materiale a lui dato. Penso che potrei inserirlo anche prima dei dizionari, ci ho provato, ma mi ha dato dei problemi, ma sono dell'idea che andrebbe lo stesso, ma avro sbagliato io qualcosa, per ora lo lascio cosi
+
+cliente_numero = 100 #Inserisco questo oggetto che funge da contatore, inizialmente pensavo ad un numero casuale, poi mi sono reso conto che sarebbe stato piu complicato e sopratutto inutile. Lo definisco qui e poi successivamente aggiungero una funzione che lo faccia incrementare. 
+
+def riduci_stanze_disponibili(tipo_camera): #Aggiungo tipo_camera come chiave per accedere al valore associato in stanze_disponibili
+    stanze_disponibili[tipo_camera] -= 1 #quando ci sara una prenotazione, ci sara un valore in meno per la stanza scelta
+    prenotazioni[tipo_camera] += 1 #invece per per i valori del dizionario prenotazioni ci sara un valore in piu
+
+def ripristina_stanze_disponibili():
+    for tipo_camera in prenotazioni.keys(): #la funzione keys() restituisce una vista degli oggetti chiave nel dizionario
+        stanze_disponibili[tipo_camera] += prenotazioni[tipo_camera] #Questa funzione serve a prendere le informazioni contenute in prenotazioni restituendole a stanze disponibili. infatti il += aserve ad aggiungere i valori di prenotazione a stanze disponibili
+
+def mostra_stanze_disponibili():
+    print("\nStanze disponibili:") 
+    for tipo_camera, disponibili in stanze_disponibili.items(): #Qui sono riuscito a farlo, ma non ho ben compreso. .items so che serve a ottenere i dati del dizionario sotto forma di tupla. Senza items non girava bene, ma penso di avere bisogno di una speigazione in piu a riguardo
+        print(f"{tipo_camera}: {disponibili}") #inserisco un f-string affinche il risultato mi venga dato nella maniera piu leggibile. poi il tipo di camera a cui si riferira seguito da disponibili che e il valore associato al numero di stanze disponibili
+
+def ricerca_prenotazione():
+    numero_cliente = input("Inserisci il tuo numero di cliente: ")
+    
+    for prenotazione in prenotazioni_salvate:   #Dato che vorrei che il cliente possa ritrovare i suoi dati devo definire la funzione ricerca prenotazione. Questa sara direttamente collegata a numero cliente, ho inserito quel contatore apposta. I dati saranno presi dalle prenotazioni in prenotazioni salvate. Successivamente il programma stampera per ogni dato che gia richede i dati salvati da x nr. cliente. Ho provato a semplificare, ma non funzionava. Inserisco le perentesi quadre per richiamare dalla lista quei dati precisi per ogni print da prenotazione. Almeno e cosi che ho visto online. 
+        if str(prenotazione["Numero Cliente"]) == numero_cliente:
+            print("Ecco i dettagli della tua prenotazione:")
+            print("Nome Cliente:", prenotazione["Nome Cliente"])
+            print("Eta Cliente:", prenotazione["Eta Cliente"])
+            print("Numero Cliente:", prenotazione["Numero Cliente"])
+            print("Tipo Camera:", prenotazione["Tipo Camera"])
+            print("Mese Prenotato:", prenotazione["Mese Prenotato"])
+            print("Giorno Prenotato:", prenotazione["Giorno Prenotato"])
+            return True  # Prenotazione trovata
+    
+    print("Nessuna prenotazione trovata con il numero di cliente fornito.")
+    return False  # Prenotazione non trovata
+
+print("Benvenuto nella nostra App") #Definite le funzioni principali, da qui parte il programma. Dara la possibilita di prenotare, cercare prenotazioni e anche di uscire. 
+
+while True: 
+    scelta_operazione = input("Vuoi prenotare una stanza o cercare una prenotazione esistente? (Prenota/Cerca/Exit): ")
+
+    if scelta_operazione.lower() == "prenota":
+        print("Cominciamo:")
+        benvenuto_cliente_input = input("Inserisca Nome e Cognome: ")
+        print(f"Benvenuto {benvenuto_cliente_input}!")
+
+        eta_cliente_input = input("Inserisca la sua eta: ")
+        eta_cliente_input_int = int(eta_cliente_input)
+
+        if 18 <= eta_cliente_input_int < 77:
+            while True:
+                vuoi_prenotare = input("Vuoi prenotare una stanza? (Si/No): ")
+                if vuoi_prenotare.lower() == "si":
+                    print("Quando vuole prenotare?")
+
+                    class SelezionaMese: #Ho definito la classe principalmente perche volevo iniziare ad usarle. Penso che anche definendo la funzione Seleziona_mese poteva essere anche piu semplice. 
+                        def __init__(self): #Ho letto che per le classi bisogna inserire __init__ affinche si crei un istanza della classe. 
+                            self.mesi = [  #grazie all'istanza sopra scritta, l'atributo mesi viene inizializzato nel nome dei mesi
+                                "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+                                "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
+                            ]
+
+                        def mostra_opzioni(self):
+                            print("Scegli un mese:")
+                            for i, mese in enumerate(self.mesi, start=1): #mi dara un'enumerazione dei mesi partendo dal primo
+                                print(f"{i}. {mese}")
+
+                        def seleziona_mese(self):
+                            while True:
+                                self.mostra_opzioni()
+                                scelta = input("Inserisci il numero corrispondente al mese desiderato: ")
+
+                                try:
+                                    indice_mese = int(scelta)
+                                    if 1 <= indice_mese <= len(self.mesi):
+                                        self.mese_scelto = self.mesi[indice_mese - 1]
+                                        print(f"Hai scelto: {self.mese_scelto}")
+                                        break
+                                    else:
+                                        print("Inserisci un numero valido.")
+                                except ValueError:
+                                    print("Inserisci un numero valido.")
+
+                    selezione_mese = SelezionaMese() #qui chiudo sia la classe che la funzione
+                    selezione_mese.seleziona_mese()
+
+                    class SelezionaGiorno:
+                        def __init__(self):
+                            self.giorni = [str(i) for i in range(1, 32)]
+
+                        def mostra_opzioni(self):
+                            print("Scegli un giorno:")
+                            for giorno in self.giorni:
+                                print(giorno)
+
+                        def seleziona_giorno(self):
+                            while True:
+                                self.mostra_opzioni()
+                                scelta = input("Inserisci il numero corrispondente al giorno desiderato: ")
+
+                                try:
+                                    self.giorno_scelto = int(scelta)
+                                    if 1 <= self.giorno_scelto <= 31:
+                                        print(f"Hai scelto il giorno {self.giorno_scelto}")
+                                        break
+                                    else:
+                                        print("Inserisci un numero valido tra 1 e 31.")
+                                except ValueError:
+                                    print("Inserisci un numero valido.")
+
+                    selezione_giorno = SelezionaGiorno()
+                    selezione_giorno.seleziona_giorno()
+
+                    def seleziona_camera(listino_camere):
+                        print("Camere disponibili: ", listino_camere)
+                        scelta_utente = input("Seleziona una camera tra quelle disponibili:")
+                        if scelta_utente in listino_camere:
+                            if stanze_disponibili[scelta_utente.lower()] > 0: #grazie a questa funzione il programma cerca nel dizionario stanze disponibili che il valore delle stanze disponibili sia maggiore di 0 
+                                riduci_stanze_disponibili(scelta_utente.lower()) #qui richiamo la funzione riduci stanze disponibili, che a sua volta modifichera la loro disponibilita
+                                if scelta_utente.lower() == "camera singola":
+                                    camera_singola()
+                                elif scelta_utente.lower() == "camera doppia":
+                                    camera_doppia()
+                                elif scelta_utente.lower() == "camera tripla":
+                                    camera_tripla()
+                                elif scelta_utente.lower() == "camera multipla":
+                                    camera_multipla()
+                                elif scelta_utente.lower() == "camera deluxe":
+                                    camera_deluxe()
+                                elif scelta_utente.lower() == "camera luna di miele":
+                                    camera_luna_di_miele()
+                                elif scelta_utente.lower() == "suite":
+                                    suite()
+                                elif scelta_utente.lower() == "calla suite":
+                                    calla_suite()
+                                elif scelta_utente.lower() == "suite presidenziale":
+                                    suite_presidenziale()
+                                elif scelta_utente.lower() == "sgabuzzino":
+                                    sgabuzzino()
+                                else:
+                                    print("Opzione scelta non valida")
+                            else:
+                                print("Camera non disponibile. Tutte le stanze sono occupate.")
+                        else:
+                            print("Camera non disponibile")
+
+                    def camera_singola():
+                        print("Hai scelto una Camera Singola")
+                        prezzo = 50
+                        print(f"Prezzo della camera: {prezzo} euro")
+                        conferma_prenotazione()
+
+                    def camera_doppia():
+                        print("Hai scelto una Camera Doppia")
+                        prezzo = 100
+                        print(f"Prezzo della camera: {prezzo} euro")
+                        conferma_prenotazione()
+
+                    def camera_tripla():
+                        print("Hai scelto una Camera Tripla")
+                        prezzo = 140
+                        print(f"Prezzo della camera: {prezzo} euro")
+                        conferma_prenotazione()
+
+                    def camera_multipla():
+                        print("Hai scelto una Camera Multipla")
+                        prezzo = 170
+                        print(f"Prezzo della camera: {prezzo} euro")
+                        conferma_prenotazione()
+
+                    def camera_deluxe():
+                        print("Hai scelto una Camera Deluxe")
+                        prezzo = 200
+                        print(f"Prezzo della camera: {prezzo} euro")
+                        conferma_prenotazione()
+
+                    def camera_luna_di_miele():
+                        print("Hai scelto una Camera Luna di Miele")
+                        prezzo = 220
+                        print(f"Prezzo della camera: {prezzo} euro")
+                        conferma_prenotazione()
+
+                    def suite():
+                        print("Hai scelto una Suite")
+                        prezzo = 250
+                        print(f"Prezzo della camera: {prezzo} euro")
+                        conferma_prenotazione()
+
+                    def calla_suite():
+                        print("Hai scelto una Calla Suite")
+                        prezzo = 270
+                        print(f"Prezzo della camera: {prezzo} euro")
+                        conferma_prenotazione()
+
+                    def suite_presidenziale():
+                        print("Hai scelto una Suite Presidenziale")
+                        prezzo = 300
+                        print(f"Prezzo della camera: {prezzo} euro")
+                        conferma_prenotazione()
+
+                    def sgabuzzino():
+                        print("Hai scelto uno Sgabuzzino")
+                        prezzo = 1000000
+                        print(f"Prezzo della camera: {prezzo} euro")
+                        conferma_prenotazione()
+
+                    def conferma_prenotazione(): #questa devo ammettere che ci ho messo un po a capirla, ma usando la funzione global, rendo nr. cliente da contatore a scope globale. Non usandolo userebbe solo la funzione in quanto tale non influenzando la variabile globale. Fatico ancora a comprenderlo a pieno. e gia una fortuna che l'ho usato bene 
+                        global cliente_numero
+
+                        conferma = input("Vuoi confermare la prenotazione? (Sì/No): ")
+                        if conferma.lower() == "si":
+                            cliente_numero += 1
+                            print("Prenotazione confermata! Numero Cliente:", cliente_numero)
+                            prenotazione = {
+                                "Nome Cliente": benvenuto_cliente_input,
+                                "Eta Cliente": eta_cliente_input_int,
+                                "Numero Cliente": cliente_numero,
+                                "Tipo Camera": scelta_utente.lower(), 
+                                "Mese Prenotato": selezione_mese.mese_scelto,
+                                "Giorno Prenotato": selezione_giorno.giorno_scelto
+                            }
+                            prenotazioni_salvate.append(prenotazione) #con la funzione append salvo, se cosi si puo dire, i dati della prenotazione. In teoria con questa funzione aggiungo in fondo all lista delle prenotazioni salvate i dati indicati
+
+                            print("Dati della sua prenotazione: ", prenotazione)
+
+                        else:
+                            print("Prenotazione annullata.")
+                            ripristina_stanze_disponibili()
+
+                    seleziona_camera(
+                        ["camera singola", "camera doppia", "camera tripla", "camera multipla", "camera deluxe",
+                        "camera luna di miele", "suite", "calla suite", "suite presidenziale", "sgabuzzino"])
+
+                else:
+                    print("Grazie per la visita, arrivederci!")
+                    break
+
+        else:
+            print("Devi essere maggiorenne per prenotare.")
+
+    elif scelta_operazione.lower() == "cerca":
+        if ricerca_prenotazione():
+            break  # Esce dal loop se la prenotazione è stata trovata
+
+    elif scelta_operazione.lower() == "exit":
+        print("Grazie per la visita, arrivederci!")
+        break  # Esce dal loop se l'utente sceglie di uscire
+
+    else:
+        print("Scelta non valida. Riprova.")
